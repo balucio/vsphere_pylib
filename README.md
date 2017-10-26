@@ -1,6 +1,6 @@
 # vsphere_pylib
 
-### vSphere Python Library**
+### vSphere Python Library
 
 Un semplice wrapper per la libreria "pyVmomi" e le API VMware vCloud, che consente la gestione degli snapshot dei Tag e delle Categorie.
 
