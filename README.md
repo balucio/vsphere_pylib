@@ -14,3 +14,6 @@ Un semplice wrapper per la libreria "pyVmomi" e le API VMware vCloud, che consen
 - **vmware_tags_to_ansible_vars.py**: questo script può essere usato per verificare che VM presentino TAG e CATEGORIE specifiche,  oppure per creare o aggiornare i file `hosts` e `hosts vars` di Ansibile a partire da un elenco di TAG e CATEGORIE specificati.
 
 
+### Configurazione:
+- **configs/mailparams.py**: contiene la configurazione del server di posta per l'invio di email.
+- **configs/vcenterparams.py**: contiene la configurazione del VCenter VMWare
