@@ -11,8 +11,10 @@ Un semplice wrapper per la libreria "pyVmomi" e le API VMware vCloud, che consen
 
 - **snapshost_manage.py**: script in python che esegue operazioni sugli snapshot delle macchine virtuali.
 - **vm_tags.py**: script che elenca i tag presenti sulle VM
+- **vm_findby_ip.py**: script per ricercare una VM a partire dal suo indirizzo IP (richiede VMWare Tools installati sulla VM)
+- **vm_setClockSync.py**: script per abilitare o disabilitare la sincronizzazione dell'orologio della VM con il Vcenter (richiede VMWare Tools installati sulla VM)
+- **vm_setTags.py**: script per impostare un TAG su una VM
 - **vmware_tags_to_ansible_vars.py**: questo script può essere usato per verificare che VM presentino TAG e CATEGORIE specifiche,  oppure per creare o aggiornare i file `hosts` e `hosts vars` di Ansibile a partire da un elenco di TAG e CATEGORIE specificati.
-
 
 ### Configurazione:
 - **configs/mailparams.py**: contiene la configurazione del server di posta per l'invio di email.
