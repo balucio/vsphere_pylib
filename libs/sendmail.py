@@ -23,7 +23,7 @@ class Mail(object):
 		msg['From'] = sender
 		msg['To'] = recipient
 		msg['Subject'] = subject
-		msg.attach(MIMEText(body, 'plain'))
+		msg.attach(MIMEText(body, 'plain','utf-8'))
 		self._server.sendmail(sender, recipient , msg.as_string())
 
 
