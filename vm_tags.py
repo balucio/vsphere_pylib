@@ -66,10 +66,6 @@ def GetArgs():
                             help='Formato di output da utilizzare.')
 
     args = parser.parse_args()
-
-    if args.user == PARS.ADMINUSER:
-        args.password = PARS.ADMINPASSWORD
-
     return args
 
 def main():
