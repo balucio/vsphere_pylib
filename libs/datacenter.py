@@ -147,7 +147,7 @@ class Datacenter(object):
             for vm in vms:
                 if vm.name == name:
                     return VirtualMachine(vm)
-            raise Exception('Impossibile trovare una VM con nome {}'.format(name))
+            raise Exception('Impossibile trovare una VM con nome {}\n'.format(name))
 
         vmList = self.getVirtualMachineList(folder, recursive)
 
@@ -155,7 +155,22 @@ class Datacenter(object):
             if vm.name == name:
                 return vm
 
-        raise Exception('Impossibile trovare una VM con nome {}'.format(name))
+        raise Exception('Impossibile trovare una VM con nome {}\n'.format(name))
+
+    def getVirtualMachineIpAddress(self, ip):
+        """Return VM object using PyVmomi"""
+
+        searchIndex = self._vmh.RetrieveContent().searchIndex
+        _vms = searchIndex.FindAllByIp(ip=ip, vmSearch=True)
+        vms = []
+        oid = []
+
+        for vm in _vms:
+            if vm._moId not in oid:
+                oid.append(vm._moId)
+                vms.append( VirtualMachine(vm) )
+
+        return vms
 
     def getVirtualMachineList(self, folder = None, recursive = False, template = False):
 
@@ -377,8 +392,10 @@ class Datacenter(object):
         tag_id = tag.id if type(tag) == TagModel else tag
         d_obj = obj if type(obj) == DynamicID else DynamicID(type=vs_type, id=obj)
 
-        result = self.tagAssociationSvc.attach(tag_id=tag_id, object_id=d_obj)
-        return result
+        self.tagAssociationSvc.attach(tag_id=tag_id, object_id=d_obj)
+
+        if not self._checkObjectHasTag(tag, obj, vs_type):
+            raise SystemError("Impossibile aggiungere il Tag alla VM")
 
     def _removeTagFromObject(self, tag, obj, vs_type='VirtualMachine'):
         """Given a tag id/object and a vmware object(Dynamic ID object or id)
@@ -389,6 +406,24 @@ class Datacenter(object):
 
         result = self.tagAssociationSvc.detach(tag_id=tag_id, object_id=obj_did)
         return result
+
+    def _checkObjectHasTag(self, tag, obj, vs_type='VirtualMachine'):
+
+        tag_id = tag.id if type(tag) == TagModel else tag
+
+        tags = self._getTagsForObject(obj, vs_type)
+
+        attached = False
+
+        for t in tags:
+            if t.id == tag_id:
+                attached = True
+                break
+
+        return attached
+
+
+
 
     def _isVmTemplate(self, vm):
         try:
