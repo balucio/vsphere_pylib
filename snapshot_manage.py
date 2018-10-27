@@ -40,7 +40,8 @@ spinner = progressMeter()
 def powerVm(vmlist, mode):
 
     tasks = []
-    if mode == 'off':
+
+    if mode == 'off' or mode == 'shutdown':
         sys.stdout.write('Spengo le VM:\n')
         oper = 'spegnimento'
         check = lambda vm: vm.isOn()
@@ -55,11 +56,25 @@ def powerVm(vmlist, mode):
 
         if check(vm):
             sys.stdout.write("-- VM %s in %s\n" % (vm.name, oper))
-            tasks.append(vm.power(mode=mode, async=True))
+            try:
+                tasks.append(vm.power(mode=mode, async=True))
+            except Exception, e:                                                                                                                                                    
+                sys.stderr.write(
+                    "Impossibile eseguire %s sulla vm %s. Verificare che i VMWare tool siano installati" % ( oper, vm.name ) )
         else:
             sys.stdout.write("-- VM %s %s\n" % (vm.name, not_oper))
 
-    WaitForTasks(tasks, onProgressUpdate=taskProgress)
+    # In caso di accenzione inserisco uno sleep
+	if mode == 'on':
+            time.sleep(80)
+
+    # È possibile che con un timeout il task sia già finito
+    try:
+        WaitForTasks(tasks, onProgressUpdate=taskProgress)
+    except Exception, e:
+        #sys.stderr.write(str(e))
+        parse_args
+
     sys.stdout.write("Operazione completata.\n")
 
 def createSnapshot(vmlist, snap_name, descrTpl = None, status='leave'):
@@ -67,12 +82,15 @@ def createSnapshot(vmlist, snap_name, descrTpl = None, status='leave'):
     if descrTpl == None:
         descrTpl = "Snapshot del %s\n" % datetime.now().strftime("%Y-%m-%d %H:%M")
     
-    tasks = []
     for vm in vmlist:
         sys.stdout.write("-- VM %s\n" % vm.name )
-        tasks.append(vm.createSnapshot(snap_name, descrTpl, async=True))
-    
-    WaitForTasks(tasks, onProgressUpdate=taskProgress)
+        try:
+            vm.createSnapshot(snap_name, descrTpl, async=False, onProgressUpdate=taskProgress)
+        except Exception, e:
+            sys.stderr.write(str(e))
+            sys.stderr.write("Impossibile creare napshot per la VM %s" % vm.name)
+            raise 
+
     sys.stdout.write("Snapshot create correttamente.\n")
 
 def taskProgress(task, percentDone):
@@ -114,8 +132,9 @@ def revertSnapshot(vmlist, snap_name):
 
     tasks = []
     sys.stdout.write("Revert snapshot %s:\n" % snap_name)
-    for idx, snap in enumerate(snap_list):
+    for idx, snap in enumerate(vmlist):
         sys.stdout.write("-- VM %s\n" % vmlist[idx].name)
+        snap = vmlist[idx].snapshotByName(snap_name)
         tasks.append(snap.revert(async=True))
     
     WaitForTasks(tasks, onProgressUpdate=taskProgress)
@@ -161,8 +180,8 @@ def GetArgs():
 
     args = parser.parse_args()
 
-    if args.user == PARS.ADMINUSER:
-        args.password = PARS.ADMINPASSWORD
+    if args.user == 'sysadmin':
+        args.password = PARS.SYSADMINPASSWORD
     return args
 
 def main():
@@ -213,7 +232,7 @@ def main():
                 raise RuntimeError("Lo snapshot %s è già presente su una o più delle VM selezionate.\n" % snap_name)
 
             vms.sort(key=lambda vm: vm.name, reverse=True)
-            powerVm(vms, 'off')
+            powerVm(vms, 'shutdown')
             createSnapshot(vms, snap_name)
             powerVm(vms, 'on')
 
@@ -222,9 +241,9 @@ def main():
             if len(vms) != len(snap_list):
                 raise RuntimeError("Lo snapshot %s non è presente su tutte le VM selezionate" % snap_name)
 
-                revertSnapshot(vms, snap_name)
-                vms.sort(key=lambda vm: vm.name, reverse=True)
-                powerVm(vms, 'on')
+            revertSnapshot(vms, snap_name)
+            vms.sort(key=lambda vm: vm.name, reverse=True)
+            powerVm(vms, 'on')
 
         elif args.command == 'delete':
 
