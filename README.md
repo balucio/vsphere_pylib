@@ -2,20 +2,20 @@
 
 ### vSphere Python Library
 
-Un semplice wrapper per la libreria "pyVmomi" e le API VMware vCloud, che consente la gestione degli snapshot dei Tag e delle Categorie.
+It is a simple wrapper for "pyVmomi" and VMware vCloud API, in order to manage VM snapshot and Tags and Categories.
 
-** Richiede l'installazione di "pyVmomi" (https://github.com/vmware/pyvmomi) e le API VMware vCloud (https://code.vmware.com/web/sdk/60/vcloudsuite-python)
+** Require: "pyVmomi" (https://github.com/vmware/pyvmomi) and VMware vCloud APIs (https://code.vmware.com/web/sdk/60/vcloudsuite-python)
 
 
-### Strumenti:
+### Tools:
 
-- **snapshost_manage.py**: script in python che esegue operazioni sugli snapshot delle macchine virtuali.
-- **vm_tags.py**: script che elenca i tag presenti sulle VM
-- **vm_findby_ip.py**: script per ricercare una VM a partire dal suo indirizzo IP (richiede VMWare Tools installati sulla VM)
-- **vm_setClockSync.py**: script per abilitare o disabilitare la sincronizzazione dell'orologio della VM con il Vcenter (richiede VMWare Tools installati sulla VM)
-- **vm_setTags.py**: script per impostare un TAG su una VM
-- **vmware_tags_to_ansible_vars.py**: questo script può essere usato per verificare che VM presentino TAG e CATEGORIE specifiche,  oppure per creare o aggiornare i file `hosts` e `hosts vars` di Ansibile a partire da un elenco di TAG e CATEGORIE specificati.
+- **snapshost_manage.py**: python script to manage VMs snapshots.
+- **vm_tags.py**: python script to list all VMs Tags
+- **vm_findby_ip.py**: python script to search a VM by their IP address (require VMWare Tools installed on VM)
+- **vm_setClockSync.py**: python script to enable o disable clock sync (require VMWare Tools installed on VM)
+- **vm_setTags.py**: python script to set a VM Tag
+- **vmware_tags_to_ansible_vars.py**: this script will update or check Ansible hosts files. In update mode some TAGS and CATEGORIES are updated in ansible hosts file. In check mode the script will check that TAGS and CATEGORY in hosts file are the same in VCenter..
 
-### Configurazione:
-- **configs/mailparams.py**: contiene la configurazione del server di posta per l'invio di email.
-- **configs/vcenterparams.py**: contiene la configurazione del VCenter VMWare
+### Config:
+- **configs/mailparams.py**: parameters for mail server (used by vmware_tags_to_ansible_vars.py).
+- **configs/vcenterparams.py**: VCenter VMWare params.
